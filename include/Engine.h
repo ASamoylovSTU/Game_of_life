@@ -1,13 +1,16 @@
 #pragma once
 
 #include "Visualizer.h"
+#include <memory>
+#include <vector>
 
+#define shared_vector std::shared_ptr<std::vector<uchar> >
+#define unique_vector std::unique_ptr<std::vector<uchar> >
 // Class implements Game-of-life logic
 class Engine
 {
 public:
     Engine(const ushort _width, const ushort _height);
-    ~Engine();
 
     // change the state of the single cell
     void set_cell_state(const ushort x, const ushort y, const bool state = true);
@@ -19,7 +22,7 @@ public:
     void display(int timeout = 1);
 
     // get current matrix
-    uchar* get_matrix() const;
+    shared_vector get_matrix() const;
 
 
 private:
@@ -35,8 +38,8 @@ private:
     // first bit is state of cell (live or dead)
     // 2-5 bits represent alive neighbours count
     // 6-8 bits unused
-    uchar* matrix;
+    shared_vector matrix;
     // matrix with cells states on the next generation
-    uchar* nextgen;
+    shared_vector nextgen;
     Visualizer visualizer;
 };

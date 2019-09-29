@@ -1,25 +1,13 @@
 #include "Engine.h"
 #include <algorithm>
 
-
 Engine::Engine(const ushort _width, const ushort _height)
     : width(_width)
     , height(_height)
-    , visualizer(Visualizer(_width, _height))
-{
-    matrix = new uchar[width * height];
-    nextgen = new uchar[width * height];
-    for(size_t i = 0; i < width * height; i++)
-    {
-        matrix[i] = 0;
-        nextgen[i] = 0;
-    }
-}
-
-Engine::~Engine()
-{
-    delete[] matrix;
-    delete[] nextgen;
+    , visualizer(_width, _height)
+{   
+    matrix = std::make_shared<std::vector<uchar> >(width * height, 0);
+    nextgen = std::make_shared<std::vector<uchar> >(width * height, 0);
 }
 
 void Engine::set_cell_state(const ushort x, const ushort y, const bool state)
@@ -35,12 +23,12 @@ void Engine::set_cell_state(const ushort x, const ushort y, const bool state)
     if (state)
     {
         // activate cell
-        nextgen[x + (y * width)] |= 1;
+        (*nextgen)[x + (y * width)] |= 1;
     }
     else
     {
         // deactivate cell
-        nextgen[x + (y * width)] &= ~0x01;
+        (*nextgen)[x + (y * width)] &= ~0x01;
     }
     // notify all neigbours about state change
     notify_neighbours(x, y, state);
@@ -57,22 +45,22 @@ void Engine::next_generation(const size_t generation)
     for (size_t gen = 0; gen < generation; gen++)
     {
         // copy displayed matrix
-        std::copy(nextgen, nextgen + (width * height), matrix);
-
+        (*matrix) = (*nextgen);
+        
         for (ushort i = 0; i < width; i++)
         {
             for (ushort j = 0; j < height; j++)
             {
-                if (matrix[i + (j * width)] == 0)
+                if ((*matrix)[i + (j * width)] == 0)
                 {
                     // cell would not be changed
                     continue;
                 }
 
                 // get state from first bit
-                bool state = matrix[i + (j * width)] & 1;
+                bool state = (*matrix)[i + (j * width)] & 1;
                 // get neigbours from 2-5 bits
-                char neigbours = matrix[i + (j * width)] >> 1;
+                char neigbours = (*matrix)[i + (j * width)] >> 1;
 
                 if (state)
                 {
@@ -102,18 +90,17 @@ void Engine::display(int timeout)
     visualizer.display(timeout);
 }
 
-uchar* Engine::get_matrix() const
+shared_vector Engine::get_matrix() const
 {
     return nextgen;
 }
-
 void Engine::notify_neighbours(const ushort x, const ushort y, bool state)
 {
     // variables define position of neigbours
     // additional logic is needed for edge cells
     int xleft, xright, ytop, ybottom;
     // pointer to current cell
-    uchar *cell_ptr = nextgen + (y * width) + x;
+    auto cell_ptr = (*nextgen).data() + (y * width) + x;
 
     if (x == 0)
     {
