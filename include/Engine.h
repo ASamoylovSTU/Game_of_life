@@ -4,8 +4,8 @@
 #include <memory>
 #include <vector>
 
-#define shared_vector std::shared_ptr<std::vector<uchar> >
-#define unique_vector std::unique_ptr<std::vector<uchar> >
+#define shared_uchar_array std::shared_ptr<uchar>
+
 // Class implements Game-of-life logic
 class Engine
 {
@@ -22,7 +22,7 @@ public:
     void display(int timeout = 1);
 
     // get current matrix
-    shared_vector get_matrix() const;
+    shared_uchar_array get_matrix() const;
 
 
 private:
@@ -38,8 +38,8 @@ private:
     // first bit is state of cell (live or dead)
     // 2-5 bits represent alive neighbours count
     // 6-8 bits unused
-    shared_vector matrix;
+    shared_uchar_array matrix;
     // matrix with cells states on the next generation
-    shared_vector nextgen;
+    shared_uchar_array nextgen;
     Visualizer visualizer;
 };

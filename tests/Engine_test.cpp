@@ -5,12 +5,13 @@
 #include "Engine.h"
 
 
-bool equal_arr(shared_vector pt1, shared_vector pt2, ushort size)
+bool equal_arr(shared_uchar_array pt1, shared_uchar_array pt2, ushort size)
 {
     for(ushort i = 0; i < size; i++)
     {
-        if ((*pt1)[i] != (*pt2)[i])
+        if (pt1.get()[i] != pt2.get()[i])
         {
+            std::cerr << i << " " << (int)pt1.get()[i] << " " << (int)pt2.get()[i] << std::endl;
             return false;
         }
     }
@@ -34,16 +35,20 @@ BOOST_AUTO_TEST_SUITE(set_cell_state)
     {
         Engine engine(100, 100);
         engine.set_cell_state(3, 1);
-        shared_vector test = std::make_shared<std::vector<uchar> >(100 * 100, 0);
-        (*test)[103] = 1; // central
-        (*test)[2] = 0x2; // upper left
-        (*test)[3] = 0x2; // upper
-        (*test)[4] = 0x2; // upper right
-        (*test)[102] = 0x2; // left
-        (*test)[104] = 0x2; // right
-        (*test)[202] = 0x2; // bottom left
-        (*test)[203] = 0x2; // bottom
-        (*test)[204] = 0x2; // bottom right
+        shared_uchar_array test(new uchar[100 * 100], std::default_delete<uchar[]>());
+        for(size_t i = 0; i < 100 * 100; i++)
+        {
+            test.get()[i] = 0;
+        }
+        test.get()[103] = 1; // central
+        test.get()[2] = 0x2; // upper left
+        test.get()[3] = 0x2; // upper
+        test.get()[4] = 0x2; // upper right
+        test.get()[102] = 0x2; // left
+        test.get()[104] = 0x2; // right
+        test.get()[202] = 0x2; // bottom left
+        test.get()[203] = 0x2; // bottom
+        test.get()[204] = 0x2; // bottom right
         BOOST_CHECK(equal_arr(engine.get_matrix(), test, 100*100));
     }
 
@@ -52,7 +57,11 @@ BOOST_AUTO_TEST_SUITE(set_cell_state)
         Engine engine(100, 100);
         engine.set_cell_state(3, 1);
         engine.set_cell_state(3, 1, false);
-        shared_vector test = std::make_shared<std::vector<uchar> >(100 * 100, 0);
+        shared_uchar_array test(new uchar[100 * 100], std::default_delete<uchar[]>());
+        for(size_t i = 0; i < 100 * 100; i++)
+        {
+            test.get()[i] = 0;
+        }
         BOOST_CHECK(equal_arr(engine.get_matrix(), test, 100*100));
     }
 BOOST_AUTO_TEST_SUITE_END()
@@ -73,27 +82,31 @@ BOOST_AUTO_TEST_SUITE(next_generation)
         engine.set_cell_state(3, 2);
 
         engine.next_generation();
-        shared_vector test = std::make_shared<std::vector<uchar> >(10 * 10, 0);
+        shared_uchar_array test(new uchar[10 * 10], std::default_delete<uchar[]>());
+        for(size_t i = 0; i < 10 * 10; i++)
+        {
+            test.get()[i] = 0;
+        }
         // first row
-        (*test)[1] = 0x2;
-        (*test)[2] = 0x2;
-        (*test)[3] = 0x2;
+        test.get()[1] = 0x2;
+        test.get()[2] = 0x2;
+        test.get()[3] = 0x2;
         // second row
-        (*test)[11] = 0x4;
-        (*test)[12] = 0x3;
-        (*test)[13] = 0x4;
+        test.get()[11] = 0x4;
+        test.get()[12] = 0x3;
+        test.get()[13] = 0x4;
         // third row
-        (*test)[21] = 0x6;
-        (*test)[22] = 0x5;
-        (*test)[23] = 0x6;
+        test.get()[21] = 0x6;
+        test.get()[22] = 0x5;
+        test.get()[23] = 0x6;
         // fourth row
-        (*test)[31] = 0x4;
-        (*test)[32] = 0x3;
-        (*test)[33] = 0x4;
+        test.get()[31] = 0x4;
+        test.get()[32] = 0x3;
+        test.get()[33] = 0x4;
         // fifth row
-        (*test)[41] = 0x2;
-        (*test)[42] = 0x2;
-        (*test)[43] = 0x2;
+        test.get()[41] = 0x2;
+        test.get()[42] = 0x2;
+        test.get()[43] = 0x2;
         BOOST_CHECK(equal_arr(engine.get_matrix(), test, 10*10));
     }
 
@@ -105,27 +118,31 @@ BOOST_AUTO_TEST_SUITE(next_generation)
         engine.set_cell_state(3, 2);
 
         engine.next_generation(5);
-        shared_vector test = std::make_shared<std::vector<uchar> >(10 * 10, 0);
+        shared_uchar_array test(new uchar[10 * 10], std::default_delete<uchar[]>());
+        for(size_t i = 0; i < 10 * 10; i++)
+        {
+            test.get()[i] = 0;
+        }
         // first row
-        (*test)[1] = 0x2;
-        (*test)[2] = 0x2;
-        (*test)[3] = 0x2;
+        test.get()[1] = 0x2;
+        test.get()[2] = 0x2;
+        test.get()[3] = 0x2;
         // second row
-        (*test)[11] = 0x4;
-        (*test)[12] = 0x3;
-        (*test)[13] = 0x4;
+        test.get()[11] = 0x4;
+        test.get()[12] = 0x3;
+        test.get()[13] = 0x4;
         // third row
-        (*test)[21] = 0x6;
-        (*test)[22] = 0x5;
-        (*test)[23] = 0x6;
+        test.get()[21] = 0x6;
+        test.get()[22] = 0x5;
+        test.get()[23] = 0x6;
         // fourth row
-        (*test)[31] = 0x4;
-        (*test)[32] = 0x3;
-        (*test)[33] = 0x4;
+        test.get()[31] = 0x4;
+        test.get()[32] = 0x3;
+        test.get()[33] = 0x4;
         // fifth row
-        (*test)[41] = 0x2;
-        (*test)[42] = 0x2;
-        (*test)[43] = 0x2;
+        test.get()[41] = 0x2;
+        test.get()[42] = 0x2;
+        test.get()[43] = 0x2;
         BOOST_CHECK(equal_arr(engine.get_matrix(), test, 10*10));
     }
 
